@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import asyncio
-import os
 import logging
+import os
 
 import discord
-from dotenv import load_dotenv
-
 from discord.ext import commands
+from dotenv import load_dotenv
 
 
 class Xanno(commands.Bot):
