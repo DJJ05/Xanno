@@ -61,7 +61,7 @@ class Moderation(commands.Cog):
 
         await member.ban(delete_message_days=dtp, reason=freason)
 
-        view = RevokeView(bot=self.bot, moderator=ctx.author, member=member)
+        view = RevokeView(bot=self.bot, member=member)
         resp = await ctx.reply(
             content=cont, embed=embed, view=view
         )
