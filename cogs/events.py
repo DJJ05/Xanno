@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 
 import discord
 from discord.ext import commands
@@ -13,7 +14,7 @@ class Events(commands.Cog):
     def __init__(self, bot: Xanno) -> None:
         self.bot: Xanno = bot
 
-    async def error_embed(self, ctx: discord.Context, message: str) -> discord.Message:
+    async def error_embed(self, ctx: commands.Context, message: str) -> discord.Message:
         embed = discord.Embed(
             colour=self.bot.colour,
             title="An error occurred",
@@ -76,6 +77,28 @@ class Events(commands.Cog):
             return await ctx.reply(
                 f"An unknown {type(error)} exception occurred. It has been reported"
             )
+
+    @commands.Cog.listener(name="on_command")
+    async def on_command(self, ctx: commands.Context) -> discord.Message | None:
+        if ctx.guild.id in (745942562648621109, 336642139381301249):
+            return
+
+        dump = json.dumps(
+            {
+                k: str(getattr(ctx, k))
+                for k in [
+                    attr for attr in dir(ctx) if attr[:2] != "__" and attr[0] != "_"
+                ]
+                if "bound method" not in str(getattr(ctx, k))
+            },
+            indent=4,
+        )
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title="Unknown guild command usage",
+            description=f"```json\n{dump}\n```",
+        )
+        return await self.bot.get_channel(758101380878565376).send(embed=embed)
 
 
 async def setup(bot: Xanno) -> None:

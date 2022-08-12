@@ -21,7 +21,9 @@ class RevokeButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         if not interaction.channel.permissions_for(interaction.user).ban_members:
-            return await interaction.response.send_message("You cannot perform this action", ephemeral=True)
+            return await interaction.response.send_message(
+                "You cannot perform this action", ephemeral=True
+            )
 
         await self.member.unban(
             reason=f"Revoked by {str(interaction.user)}({interaction.user.id})"
@@ -31,7 +33,7 @@ class RevokeButton(discord.ui.Button):
             colour=self.bot.colour,
             title="Ban successfully revoked",
             description=f"`User:` {str(self.member)}({self.member.id})\n"
-                        f"`Moderator:` {str(interaction.user)}({interaction.user.id})",
+            f"`Moderator:` {str(interaction.user)}({interaction.user.id})",
             timestamp=datetime.datetime.now(),
         )
         embed.set_thumbnail(url=str(self.member.display_avatar))

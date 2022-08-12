@@ -7,7 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from main import Xanno
-from utils.views import RevokeButton, RevokeView
+from utils.views import RevokeView
 
 
 class Moderation(commands.Cog):
@@ -62,9 +62,7 @@ class Moderation(commands.Cog):
         await member.ban(delete_message_days=dtp, reason=freason)
 
         view = RevokeView(bot=self.bot, member=member)
-        resp = await ctx.reply(
-            content=cont, embed=embed, view=view
-        )
+        resp = await ctx.reply(content=cont, embed=embed, view=view)
         await asyncio.sleep(60)
 
         button = view.children[0]
