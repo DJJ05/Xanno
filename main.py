@@ -26,7 +26,9 @@ class Xanno(commands.Bot):
             **kwargs,
         )
         self.logger = self.fetchlogger()
+        self.logger.info("\n")
         self.synced = False
+        self.colour = 0x6AC9B8
 
     @staticmethod
     def fetchlogger() -> logging.Logger:
