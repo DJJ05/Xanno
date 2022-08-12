@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import datetime
 
 import discord
@@ -6,6 +7,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from main import Xanno
+from utils.views import RevokeButton, RevokeView
 
 
 class Moderation(commands.Cog):
@@ -25,15 +27,18 @@ class Moderation(commands.Cog):
         self,
         ctx: commands.Context,
         member: discord.Member,
-        days_to_purge: commands.Greedy[int] = 1,
+        days_to_purge: int = 1,
         *,
-        reason: str = "",
+        reason: str = "None",
     ) -> discord.Message:
         """Ban a member from a guild"""
-        dtp = days_to_purge[0] if not isinstance(days_to_purge, int) else days_to_purge
+        if member == ctx.me:
+            return await ctx.reply("I cannot ban myself")
+
+        dtp = days_to_purge
         dtp = 0 if dtp < 0 else 7 if dtp > 7 else dtp
         freason = f"{str(ctx.author)}({ctx.author.id}): {reason}"
-        await member.ban(delete_message_days=dtp, reason=freason)
+
         embed = discord.Embed(
             colour=self.bot.colour,
             title="Member successfully banned",
@@ -44,7 +49,28 @@ class Moderation(commands.Cog):
             timestamp=datetime.datetime.now(),
         )
         embed.set_thumbnail(url=str(member.display_avatar))
-        return await ctx.reply(embed=embed)
+
+        embed2 = embed.copy()
+        embed2.title = f"You were banned from {ctx.guild.name}"
+
+        cont = "User has been informed"
+        try:
+            await member.send(embed=embed2)
+        except discord.HTTPException:
+            cont = "User could not be informed"
+
+        await member.ban(delete_message_days=dtp, reason=freason)
+
+        view = RevokeView(bot=self.bot, moderator=ctx.author, member=member)
+        resp = await ctx.reply(
+            content=cont, embed=embed, view=view
+        )
+        await asyncio.sleep(60)
+
+        button = view.children[0]
+        if not button.disabled:
+            button.disabled = True
+            await resp.edit(view=view)
 
 
 async def setup(bot: Xanno) -> None:
