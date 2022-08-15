@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import asyncio
+import datetime
 import logging
 import os
+import sys
+import traceback
 
 import discord
 from discord.ext import commands
@@ -22,13 +25,37 @@ class Xanno(commands.Bot):
             log_handler=kwargs.pop(
                 "log_handler", logging.FileHandler(filename="log.LOG", encoding="utf-8")
             ),
+            allowed_mentions=discord.AllowedMentions(everyone=False),
             *args,
             **kwargs,
         )
         self.logger = self.fetchlogger()
-        self.logger.info("\n")
         self.synced = False
         self.colour = 0x6AC9B8
+
+    async def on_error(self, event_method, *args, **kwargs) -> None:
+        ei = sys.exc_info()
+        private = "".join(traceback.format_exception(ei[0], ei[1], ei[2]))
+        public = (
+            "".join(traceback.format_exception(ei[0], ei[1], ei[2], 2))
+            .replace(os.getcwd(), "CWD")
+            .replace("CWD/venv/lib/python3.10/site-packages/discord", "discord")
+        )
+
+        channel = self.get_channel(1008350814730993675)
+        embed = discord.Embed(
+            colour=self.colour,
+            title="An unknown error occurred",
+            description=f"`FUNC:` {event_method}\n```ansi\n\u001b[31m"
+            + public
+            + "\n```",
+            timestamp=datetime.datetime.now(),
+        )
+        await channel.send(embed=embed)
+        return self.logger.error(
+            private
+            + f"{', '.join([str(a) for a in args])} —— {', '.join(list(kwargs))}"
+        )
 
     @staticmethod
     def fetchlogger() -> logging.Logger:
