@@ -9,7 +9,7 @@ LOGGING_CALLBACKS = {
     "on_guild_channel_create": True,
     "on_guild_channel_update": True,
     "on_guild_channel_pins_update": True,
-    "on_guild_available": True,
+    "on_guild_available": False,
     "on_guild_update": True,
     "on_guild_emojis_update": True,
     "on_guild_stickers_update": True,
