@@ -414,7 +414,9 @@ class Events(commands.Cog):
         removed = [emoji.name for emoji in before if emoji not in after]
 
         embed.description += f"`ADDED:` {', '.join(added)}\n" if len(added) > 0 else ""
-        embed.description += f"`REMOVED:` {', '.join(removed)}\n" if len(removed) > 0 else ""
+        embed.description += (
+            f"`REMOVED:` {', '.join(removed)}\n" if len(removed) > 0 else ""
+        )
         embed.description = embed.description.removesuffix("\n")
 
         if not embed.description:
@@ -446,7 +448,9 @@ class Events(commands.Cog):
         removed = [sticker.name for sticker in before if sticker not in after]
 
         embed.description += f"`ADDED:` {', '.join(added)}\n" if len(added) > 0 else ""
-        embed.description += f"`REMOVED:` {', '.join(removed)}\n" if len(removed) > 0 else ""
+        embed.description += (
+            f"`REMOVED:` {', '.join(removed)}\n" if len(removed) > 0 else ""
+        )
         embed.description = embed.description.removesuffix("\n")
 
         if not embed.description:
@@ -454,32 +458,38 @@ class Events(commands.Cog):
 
         return await logchannel.send(embed=embed)
 
-    async def handle_inv_event(self, invite: discord.Invite, event: str, config: dict) -> discord.Message | None:
+    async def handle_inv_event(
+        self, invite: discord.Invite, event: str, config: dict
+    ) -> discord.Message | None:
         logchannel = invite.guild.get_channel(config["channel"])
 
         embed = discord.Embed(
             colour=self.bot.colour,
             title=f"A guild invite was {event}",
             description=f"`CHANNEL:` {invite.channel.mention}\n"
-                        f"`USER:` {invite.inviter.mention}\n"
-                        f"`CODE:` {invite.code}\n"
-                        f"`CREATED AT:` {discord.utils.format_dt(invite.created_at, 'R')}\n"
-                        f"`MAX AGE:` {invite.max_age}\n"
-                        f"`TEMPORARY:` {invite.temporary}\n"
-                        f"`USES:` {invite.uses}/{invite.max_uses}",
+            f"`USER:` {invite.inviter.mention}\n"
+            f"`CODE:` {invite.code}\n"
+            f"`CREATED AT:` {discord.utils.format_dt(invite.created_at, 'R')}\n"
+            f"`MAX AGE:` {invite.max_age}\n"
+            f"`TEMPORARY:` {invite.temporary}\n"
+            f"`USES:` {invite.uses}/{invite.max_uses}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=invite.guild.icon.url)
         return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_invite_create")
-    async def _logging_on_invite_create(self, invite: discord.Invite) -> discord.Message | None:
+    async def _logging_on_invite_create(
+        self, invite: discord.Invite
+    ) -> discord.Message | None:
         config = await self.get_guild_config(invite.guild)
         if not config or not config["callbacks"]["on_invite_create"]:
             return
         return await self.handle_inv_event(invite, "created", config)
 
     @commands.Cog.listener(name="on_invite_delete")
-    async def _logging_on_invite_delete(self, invite: discord.Invite) -> discord.Message | None:
+    async def _logging_on_invite_delete(
+        self, invite: discord.Invite
+    ) -> discord.Message | None:
         config = await self.get_guild_config(invite.guild)
         if not config or not config["callbacks"]["on_invite_delete"]:
             return
@@ -499,9 +509,9 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A guild integration was created",
             description=f"`NAME:` {integration.name}\n"
-                        f"`TYPE:` {integration.type}\n"
-                        f"`CREATOR:` {integration.user.mention}\n"
-                        f"`ACCOUNT:` {integration.account.name}",
+            f"`TYPE:` {integration.type}\n"
+            f"`CREATOR:` {integration.user.mention}\n"
+            f"`ACCOUNT:` {integration.account.name}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=integration.guild.icon.url)
 
@@ -521,16 +531,18 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A guild integration was updated",
             description=f"`NAME:` {integration.name}\n"
-                        f"`TYPE:` {integration.type}\n"
-                        f"`CREATOR:` {integration.user.mention}\n"
-                        f"`ACCOUNT:` {integration.account.name}",
+            f"`TYPE:` {integration.type}\n"
+            f"`CREATOR:` {integration.user.mention}\n"
+            f"`ACCOUNT:` {integration.account.name}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=integration.guild.icon.url)
 
         return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_guild_integrations_update")
-    async def _logging_on_guild_integrations_update(self, guild: discord.Guild) -> discord.Message | None:
+    async def _logging_on_guild_integrations_update(
+        self, guild: discord.Guild
+    ) -> discord.Message | None:
         config = await self.get_guild_config(guild)
         if not config or not config["callbacks"]["on_guild_integrat_update"]:
             return
@@ -565,30 +577,36 @@ class Events(commands.Cog):
 
         return await logchannel.send(embed=embed)
 
-    async def handle_member_event(self, member: discord.Member, event: str, config: dict) -> discord.Message | None:
+    async def handle_member_event(
+        self, member: discord.Member, event: str, config: dict
+    ) -> discord.Message | None:
         logchannel = member.guild.get_channel(config["channel"])
 
         embed = discord.Embed(
             colour=self.bot.colour,
             title=f"A member has {event} the guild",
             description=f"`MEMBER:` {member.mention}\n"
-                        f"`ID:` {member.id}\n"
-                        f"`CREATED:` {discord.utils.format_dt(member.created_at, 'R')}\n"
-                        f"`JOINED:` {discord.utils.format_dt(member.joined_at, 'R')}",
+            f"`ID:` {member.id}\n"
+            f"`CREATED:` {discord.utils.format_dt(member.created_at, 'R')}\n"
+            f"`JOINED:` {discord.utils.format_dt(member.joined_at, 'R')}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=member.display_avatar.url)
 
         return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_member_join")
-    async def _logging_on_member_join(self, member: discord.Member) -> discord.Message | None:
+    async def _logging_on_member_join(
+        self, member: discord.Member
+    ) -> discord.Message | None:
         config = await self.get_guild_config(member.guild)
         if not config or not config["callbacks"]["on_member_join"]:
             return
         return await self.handle_member_event(member, "joined", config)
 
     @commands.Cog.listener(name="on_member_remove")
-    async def _logging_on_member_remove(self, member: discord.Member) -> discord.Message | None:
+    async def _logging_on_member_remove(
+        self, member: discord.Member
+    ) -> discord.Message | None:
         config = await self.get_guild_config(member.guild)
         if not config or not config["callbacks"]["on_member_remove"]:
             return
@@ -611,13 +629,15 @@ class Events(commands.Cog):
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=after.guild.icon.url)
 
-        k_ignore = ('guild_permissions', 'roles')
+        k_ignore = ("guild_permissions", "roles")
         beforeattrs = {
             k: (
-                str(getattr(before, k)) if k not in k_ignore else (
-                    len(getattr(before, k)) if isinstance(getattr(before, k), list) else (
-                        getattr(before, k).value
-                    )
+                str(getattr(before, k))
+                if k not in k_ignore
+                else (
+                    len(getattr(before, k))
+                    if isinstance(getattr(before, k), list)
+                    else (getattr(before, k).value)
                 )
             )
             for k in [
@@ -627,10 +647,12 @@ class Events(commands.Cog):
         }
         afterattrs = {
             k: (
-                str(getattr(after, k)) if k not in k_ignore else (
-                    len(getattr(after, k)) if isinstance(getattr(after, k), list) else (
-                        getattr(after, k).value
-                    )
+                str(getattr(after, k))
+                if k not in k_ignore
+                else (
+                    len(getattr(after, k))
+                    if isinstance(getattr(after, k), list)
+                    else (getattr(after, k).value)
                 )
             )
             for k in [
@@ -648,16 +670,22 @@ class Events(commands.Cog):
 
         return await logchannel.send(embed=embed)
 
-    async def handle_memberban_event(self, member: discord.Member | discord.User, guild: discord.Guild, event: str, config: dict) -> discord.Message | None:
+    async def handle_memberban_event(
+        self,
+        member: discord.Member | discord.User,
+        guild: discord.Guild,
+        event: str,
+        config: dict,
+    ) -> discord.Message | None:
         logchannel = guild.get_channel(config["channel"])
 
         embed = discord.Embed(
             colour=self.bot.colour,
             title=f"A member was {event} from the guild",
             description=f"`MEMBER:` {member.mention}\n"
-                        f"`NAME:` {str(member)}\n"
-                        f"`ID:` {member.id}\n"
-                        f"`CREATED:` {discord.utils.format_dt(member.created_at, 'R')}",
+            f"`NAME:` {str(member)}\n"
+            f"`ID:` {member.id}\n"
+            f"`CREATED:` {discord.utils.format_dt(member.created_at, 'R')}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=member.display_avatar.url)
 
@@ -700,23 +728,36 @@ class Events(commands.Cog):
 
         before.embeds = after.embeds = []
 
-        k_ignore = ("attachments", )
+        k_ignore = ("attachments",)
         beforeattrs = {
-            k: (str(getattr(before, k)) if k not in k_ignore else (len(getattr(before, k))))
+            k: (
+                str(getattr(before, k))
+                if k not in k_ignore
+                else (len(getattr(before, k)))
+            )
             for k in [
                 attr for attr in dir(before) if attr[:2] != "__" and attr[0] != "_"
             ]
             if "bound method" not in str(getattr(before, k))
         }
         afterattrs = {
-            k: (str(getattr(after, k)) if k not in k_ignore else (len(getattr(after, k))))
+            k: (
+                str(getattr(after, k))
+                if k not in k_ignore
+                else (len(getattr(after, k)))
+            )
             for k in [
                 attr for attr in dir(after) if attr[:2] != "__" and attr[0] != "_"
             ]
             if "bound method" not in str(getattr(after, k))
         }
         differences = {
-            k: (beforeattrs[k], v) for k, v in afterattrs.items() if (beforeattrs[k] != v and k not in ("embeds", "system_content", "content", "edited_at"))
+            k: (beforeattrs[k], v)
+            for k, v in afterattrs.items()
+            if (
+                beforeattrs[k] != v
+                and k not in ("embeds", "system_content", "content", "edited_at")
+            )
         }
 
         if len(differences.keys()) == 0:
@@ -730,7 +771,9 @@ class Events(commands.Cog):
         return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_message_delete")
-    async def _logging_on_message_delete(self, message: discord.Message) -> discord.Message | None:
+    async def _logging_on_message_delete(
+        self, message: discord.Message
+    ) -> discord.Message | None:
         config = await self.get_guild_config(message.guild)
         if not config or not config["callbacks"]["on_message_delete"]:
             return
@@ -741,8 +784,8 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A message was deleted",
             description=f"`CONTENT:` {message.clean_content}\n"
-                        f"`AUTHOR:` {message.author.mention}\n"
-                        f"`CHANNEL:` {message.channel.mention}",
+            f"`AUTHOR:` {message.author.mention}\n"
+            f"`CHANNEL:` {message.channel.mention}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=message.author.display_avatar.url)
 
@@ -764,7 +807,7 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"{len(messages)} messages were bulk deleted",
             description=f"`CHANNEL:` {message.channel.mention}\n"
-                        f"`AUTHORS:` {len(authors)}",
+            f"`AUTHORS:` {len(authors)}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=message.guild.icon.url)
 
@@ -784,9 +827,9 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A reaction was added to a message",
             description=f"`USER:` {user.mention}\n"
-                        f"`CHANNEL:` {reaction.message.channel.mention}\n"
-                        f"`COUNT:` {reaction.count}\n"
-                        f"{reaction.message.jump_url}",
+            f"`CHANNEL:` {reaction.message.channel.mention}\n"
+            f"`COUNT:` {reaction.count}\n"
+            f"{reaction.message.jump_url}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=user.display_avatar.url)
 
@@ -806,9 +849,9 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A reaction was removed from a message",
             description=f"`USER:` {user.mention}\n"
-                        f"`CHANNEL:` {reaction.message.channel.mention}\n"
-                        f"`COUNT:` {reaction.count}\n"
-                        f"{reaction.message.jump_url}",
+            f"`CHANNEL:` {reaction.message.channel.mention}\n"
+            f"`COUNT:` {reaction.count}\n"
+            f"{reaction.message.jump_url}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=user.display_avatar.url)
 
@@ -828,8 +871,8 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"{len(reactions)} reactions were cleared",
             description=f"`AUTHOR:` {message.author.mention}\n"
-                        f"`CHANNEL:` {message.channel.mention}\n"
-                        f"{message.jump_url}",
+            f"`CHANNEL:` {message.channel.mention}\n"
+            f"{message.jump_url}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=message.author.display_avatar.url)
 
@@ -849,15 +892,17 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"Reaction emojis were cleared",
             description=f"`AUTHOR:` {reaction.message.author.mention}\n"
-                        f"`CHANNEL:` {reaction.message.channel.mention}\n"
-                        f"{reaction.message.jump_url}",
+            f"`CHANNEL:` {reaction.message.channel.mention}\n"
+            f"{reaction.message.jump_url}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=reaction.message.author.display_avatar.url)
 
         return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_guild_role_create")
-    async def _logging_on_guild_role_create(self, role: discord.Role) -> discord.Message | None:
+    async def _logging_on_guild_role_create(
+        self, role: discord.Role
+    ) -> discord.Message | None:
         config = await self.get_guild_config(role.guild)
         if not config or not config["callbacks"]["on_guild_role_create"]:
             return
@@ -868,16 +913,18 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A new role was created",
             description=f"`NAME:` {role.name}\n"
-                        f"`HOISTED:` {role.hoist}\n"
-                        f"`POSITION:` {role.position}\n"
-                        f"`MANAGED:` {role.managed}",
+            f"`HOISTED:` {role.hoist}\n"
+            f"`POSITION:` {role.position}\n"
+            f"`MANAGED:` {role.managed}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=role.guild.icon.url)
 
         return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_guild_role_delete")
-    async def _logging_on_guild_role_delete(self, role: discord.Role) -> discord.Message | None:
+    async def _logging_on_guild_role_delete(
+        self, role: discord.Role
+    ) -> discord.Message | None:
         config = await self.get_guild_config(role.guild)
         if not config or not config["callbacks"]["on_guild_role_delete"]:
             return
@@ -888,9 +935,9 @@ class Events(commands.Cog):
             colour=self.bot.colour,
             title=f"A role was deleted",
             description=f"`NAME:` {role.name}\n"
-                        f"`HOISTED:` {role.hoist}\n"
-                        f"`POSITION:` {role.position}\n"
-                        f"`MANAGED:` {role.managed}",
+            f"`HOISTED:` {role.hoist}\n"
+            f"`POSITION:` {role.position}\n"
+            f"`MANAGED:` {role.managed}",
             timestamp=datetime.datetime.now(),
         ).set_thumbnail(url=role.guild.icon.url)
 
@@ -917,10 +964,10 @@ class Events(commands.Cog):
         beforeattrs = {
             k: (
                 str(getattr(before, k))
-                if not isinstance(k, (list, dict))
+                if not isinstance(getattr(before, k), (list, dict))
                 else (
                     len(getattr(before, k))
-                    if isinstance(k, list)
+                    if isinstance(getattr(before, k), list)
                     else len(getattr(before, k).keys())
                 )
             )
@@ -932,10 +979,10 @@ class Events(commands.Cog):
         afterattrs = {
             k: (
                 str(getattr(after, k))
-                if not isinstance(k, (list, dict))
+                if not isinstance(getattr(after, k), (list, dict))
                 else (
                     len(getattr(after, k))
-                    if isinstance(k, list)
+                    if isinstance(getattr(after, k), list)
                     else len(getattr(after, k).keys())
                 )
             )
@@ -957,84 +1004,457 @@ class Events(commands.Cog):
     @commands.Cog.listener(name="on_scheduled_event_create")
     async def _logging_on_scheduled_event_create(
         self, event: discord.ScheduledEvent
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(event.guild)
+        if not config or not config["callbacks"]["on_scheduled_event_create"]:
+            return
+
+        logchannel = event.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A scheduled event was created",
+            description=f"`NAME:` {event.name}\n"
+            f"`DESC:` {event.description}\n"
+            f"`START:` {discord.utils.format_dt(event.start_time, 'R')}\n"
+            f"`END:` {discord.utils.format_dt(event.end_time, 'R')}\n"
+            f"`CREATOR:` {event.creator.mention if event.creator else 'NaN'}\n"
+            f"`LOCATION:` {event.location}\n"
+            f"`STATUS:` {event.status}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=event.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_scheduled_event_delete")
     async def _logging_on_scheduled_event_delete(
         self, event: discord.ScheduledEvent
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(event.guild)
+        if not config or not config["callbacks"]["on_scheduled_event_delete"]:
+            return
+
+        logchannel = event.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A scheduled event was deleted",
+            description=f"`NAME:` {event.name}\n"
+            f"`DESC:` {event.description}\n"
+            f"`START:` {discord.utils.format_dt(event.start_time, 'R')}\n"
+            f"`END:` {discord.utils.format_dt(event.end_time, 'R')}\n"
+            f"`CREATOR:` {event.creator.mention if event.creator else 'NaN'}\n"
+            f"`LOCATION:` {event.location}\n"
+            f"`STATUS:` {event.status}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=event.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_scheduled_event_update")
     async def _logging_on_scheduled_event_update(
         self, before: discord.ScheduledEvent, after: discord.ScheduledEvent
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(after.guild)
+        if not config or not config["callbacks"]["on_scheduled_event_update"]:
+            return
+
+        logchannel = after.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"The '{before.name}' event was updated",
+            description="",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=after.guild.icon.url)
+
+        k_ignores = ("entity_type", "entity_id", "privacy_level")
+        ktypes = (list, dict, datetime.datetime)
+        beforeattrs = {
+            k: (
+                str(getattr(before, k))
+                if not isinstance(getattr(before, k), ktypes)
+                else (
+                    len(getattr(before, k))
+                    if isinstance(getattr(before, k), list)
+                    else len(getattr(before, k).keys())
+                    if isinstance(getattr(before, k), dict)
+                    else discord.utils.format_dt(getattr(before, k), "R")
+                )
+            )
+            for k in [
+                attr for attr in dir(before) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(before, k)) and k not in k_ignores
+        }
+        afterattrs = {
+            k: (
+                str(getattr(after, k))
+                if not isinstance(getattr(after, k), ktypes)
+                else (
+                    len(getattr(after, k))
+                    if isinstance(getattr(after, k), list)
+                    else len(getattr(after, k).keys())
+                    if isinstance(getattr(after, k), dict)
+                    else discord.utils.format_dt(getattr(after, k), "R")
+                )
+            )
+            for k in [
+                attr for attr in dir(after) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(after, k)) and k not in k_ignores
+        }
+        differences = {
+            k: (beforeattrs[k], v) for k, v in afterattrs.items() if beforeattrs[k] != v
+        }
+
+        for name, change in differences.items():
+            embed.description += f"`{name.upper()}:` {change[0]} → {change[1]}\n"
+        embed.description = embed.description.removesuffix("\n")
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_scheduled_event_user_add")
     async def _logging_on_scheduled_event_user_add(
         self, event: discord.ScheduledEvent, user: discord.User
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(event.guild)
+        if not config or not config["callbacks"]["on_sched_event_user_add"]:
+            return
+
+        logchannel = event.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A user joined an event",
+            description=f"`EVENT:` {event.name}\n" f"`USER:` {user.mention}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=user.display_avatar.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_scheduled_event_user_remove")
     async def _logging_on_scheduled_event_user_remove(
         self, event: discord.ScheduledEvent, user: discord.User
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(event.guild)
+        if not config or not config["callbacks"]["on_sched_event_user_remove"]:
+            return
+
+        logchannel = event.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A user left an event",
+            description=f"`EVENT:` {event.name}\n" f"`USER:` {user.mention}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=user.display_avatar.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_stage_instance_create")
     async def _logging_on_stage_instance_create(
         self, stage_instance: discord.StageInstance
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(stage_instance.guild)
+        if not config or not config["callbacks"]["on_stage_instance_create"]:
+            return
+
+        logchannel = stage_instance.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A stage instance was created",
+            description=f"`CHANNEL:` {stage_instance.channel_id}\n"
+            f"`TOPIC:` {stage_instance.topic}\n"
+            f"`DISCOVERABLE:` {not stage_instance.discoverable_disabled}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=stage_instance.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_stage_instance_delete")
     async def _logging_on_stage_instance_delete(
         self, stage_instance: discord.StageInstance
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(stage_instance.guild)
+        if not config or not config["callbacks"]["on_stage_instance_delete"]:
+            return
+
+        logchannel = stage_instance.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A stage instance was deleted",
+            description=f"`CHANNEL:` {stage_instance.channel_id}\n"
+            f"`TOPIC:` {stage_instance.topic}\n"
+            f"`DISCOVERABLE:` {not stage_instance.discoverable_disabled}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=stage_instance.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_stage_instance_update")
     async def _logging_on_stage_instance_update(
         self, before: discord.StageInstance, after: discord.StageInstance
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(after.guild)
+        if not config or not config["callbacks"]["on_stage_instance_update"]:
+            return
+
+        logchannel = after.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A stage instance was updated",
+            description="",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=after.guild.icon.url)
+
+        k_ignores = ("privacy_level",)
+        ktypes = (list, dict, datetime.datetime)
+        beforeattrs = {
+            k: (
+                str(getattr(before, k))
+                if not isinstance(getattr(before, k), ktypes)
+                else (
+                    len(getattr(before, k))
+                    if isinstance(getattr(before, k), list)
+                    else len(getattr(before, k).keys())
+                    if isinstance(getattr(before, k), dict)
+                    else discord.utils.format_dt(getattr(before, k), "R")
+                )
+            )
+            for k in [
+                attr for attr in dir(before) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(before, k)) and k not in k_ignores
+        }
+        afterattrs = {
+            k: (
+                str(getattr(after, k))
+                if not isinstance(getattr(after, k), ktypes)
+                else (
+                    len(getattr(after, k))
+                    if isinstance(getattr(after, k), list)
+                    else len(getattr(after, k).keys())
+                    if isinstance(getattr(after, k), dict)
+                    else discord.utils.format_dt(getattr(after, k), "R")
+                )
+            )
+            for k in [
+                attr for attr in dir(after) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(after, k)) and k not in k_ignores
+        }
+        differences = {
+            k: (beforeattrs[k], v) for k, v in afterattrs.items() if beforeattrs[k] != v
+        }
+
+        for name, change in differences.items():
+            embed.description += f"`{name.upper()}:` {change[0]} → {change[1]}\n"
+        embed.description = embed.description.removesuffix("\n")
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_create")
-    async def _logging_on_thread_create(self, thread: discord.Thread) -> None:
-        ...
+    async def _logging_on_thread_create(
+        self, thread: discord.Thread
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(thread.guild)
+        if not config or not config["callbacks"]["on_thread_create"]:
+            return
+
+        logchannel = thread.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A thread was created",
+            description=f"`NAME:` {thread.name}\n"
+            f"`CHANNEL:` <#{thread.parent_id}>\n"
+            f"`OWNER:` <@!{thread.owner_id}>\n"
+            f"`AUTO ARCHIVE:` {thread.auto_archive_duration}\n"
+            f"{thread.jump_url}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=thread.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_join")
-    async def _logging_on_thread_join(self, thread: discord.Thread) -> None:
-        ...
+    async def _logging_on_thread_join(
+        self, thread: discord.Thread
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(thread.guild)
+        if not config or not config["callbacks"]["on_thread_join"]:
+            return
+
+        logchannel = thread.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A user joined a thread",
+            description=f"`NAME:` {thread.name}\n"
+            f"`CHANNEL:` <#{thread.parent_id}>\n"
+            f"`OWNER:` <@!{thread.owner_id}>\n"
+            f"`AUTO ARCHIVE:` {thread.auto_archive_duration}\n"
+            f"{thread.jump_url}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=thread.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_update")
     async def _logging_on_thread_update(
         self, before: discord.Thread, after: discord.Thread
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(after.guild)
+        if not config or not config["callbacks"]["on_thread_update"]:
+            return
+
+        logchannel = after.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"The thread '{before.name}' was updated",
+            description="",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=after.guild.icon.url)
+
+        k_ignores = ("",)
+        ktypes = (list, dict, datetime.datetime)
+        beforeattrs = {
+            k: (
+                str(getattr(before, k))
+                if not isinstance(getattr(before, k), ktypes)
+                else (
+                    len(getattr(before, k))
+                    if isinstance(getattr(before, k), list)
+                    else len(getattr(before, k).keys())
+                    if isinstance(getattr(before, k), dict)
+                    else discord.utils.format_dt(getattr(before, k), "R")
+                )
+            )
+            for k in [
+                attr for attr in dir(before) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(before, k)) and k not in k_ignores
+        }
+        afterattrs = {
+            k: (
+                str(getattr(after, k))
+                if not isinstance(getattr(after, k), ktypes)
+                else (
+                    len(getattr(after, k))
+                    if isinstance(getattr(after, k), list)
+                    else len(getattr(after, k).keys())
+                    if isinstance(getattr(after, k), dict)
+                    else discord.utils.format_dt(getattr(after, k), "R")
+                )
+            )
+            for k in [
+                attr for attr in dir(after) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(after, k)) and k not in k_ignores
+        }
+        differences = {
+            k: (beforeattrs[k], v) for k, v in afterattrs.items() if beforeattrs[k] != v
+        }
+
+        for name, change in differences.items():
+            embed.description += f"`{name.upper()}:` {change[0]} → {change[1]}\n"
+        embed.description = embed.description.removesuffix("\n")
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_remove")
-    async def _logging_on_thread_remove(self, thread: discord.Thread) -> None:
-        ...
+    async def _logging_on_thread_remove(
+        self, thread: discord.Thread
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(thread.guild)
+        if not config or not config["callbacks"]["on_thread_remove"]:
+            return
+
+        logchannel = thread.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A thread was removed",
+            description=f"`NAME:` {thread.name}\n"
+            f"`CHANNEL:` <#{thread.parent_id}>\n"
+            f"`OWNER:` <@!{thread.owner_id}>\n"
+            f"`AUTO ARCHIVE:` {thread.auto_archive_duration}\n"
+            f"`MESSAGES:` {thread.message_count}\n"
+            f"{thread.jump_url}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=thread.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_delete")
-    async def _logging_on_thread_delete(self, thread: discord.Thread) -> None:
-        ...
+    async def _logging_on_thread_delete(
+        self, thread: discord.Thread
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(thread.guild)
+        if not config or not config["callbacks"]["on_thread_delete"]:
+            return
+
+        logchannel = thread.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A thread was deleted",
+            description=f"`NAME:` {thread.name}\n"
+            f"`CHANNEL:` <#{thread.parent_id}>\n"
+            f"`OWNER:` <@!{thread.owner_id}>\n"
+            f"`AUTO ARCHIVE:` {thread.auto_archive_duration}\n"
+            f"`MESSAGES:` {thread.message_count}\n"
+            f"{thread.jump_url}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=thread.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_member_join")
     async def _logging_on_thread_member_join(
         self, member: discord.ThreadMember
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(member.thread.guild)
+        if not config or not config["callbacks"]["on_thread_member_join"]:
+            return
+
+        logchannel = member.thread.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A member joined a thread",
+            description=f"`USER:` {member.id}\n"
+            f"`THREAD:` {member.thread.mention}\n"
+            f"{member.thread.jump_url}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=member.thread.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_thread_member_remove")
     async def _logging_on_thread_member_remove(
         self, member: discord.ThreadMember
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(member.thread.guild)
+        if not config or not config["callbacks"]["on_thread_member_remove"]:
+            return
+
+        logchannel = member.thread.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A member left a thread",
+            description=f"`USER:` {member.id}\n"
+            f"`THREAD:` {member.thread.mention}\n"
+            f"{member.thread.jump_url}",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=member.thread.guild.icon.url)
+
+        return await logchannel.send(embed=embed)
 
     @commands.Cog.listener(name="on_voice_state_update")
     async def _logging_on_voice_state_update(
@@ -1042,12 +1462,75 @@ class Events(commands.Cog):
         member: discord.Member,
         before: discord.VoiceState,
         after: discord.VoiceState,
-    ) -> None:
-        ...
+    ) -> discord.Message | None:
+        config = await self.get_guild_config(member.guild)
+        if not config or not config["callbacks"]["on_voice_state_update"]:
+            return
 
-    @commands.Cog.listener(name="on_ready")
-    async def _logging_on_ready(self) -> None:
-        ...
+        logchannel = member.guild.get_channel(config["channel"])
+
+        embed = discord.Embed(
+            colour=self.bot.colour,
+            title=f"A member's voice state was updated",
+            description=f"`MEMBER:` {member.mention}\n",
+            timestamp=datetime.datetime.now(),
+        ).set_thumbnail(url=member.guild.icon.url)
+
+        k_ignores = ("",)
+        ktypes = (
+            list,
+            dict,
+            datetime.datetime,
+            discord.VoiceChannel,
+            discord.StageChannel,
+        )
+        beforeattrs = {
+            k: (
+                str(getattr(before, k))
+                if not isinstance(getattr(before, k), ktypes)
+                else (
+                    len(getattr(before, k))
+                    if isinstance(getattr(before, k), list)
+                    else len(getattr(before, k).keys())
+                    if isinstance(getattr(before, k), dict)
+                    else discord.utils.format_dt(getattr(before, k), "R")
+                    if isinstance(getattr(before, k), datetime.datetime)
+                    else getattr(before, k).name
+                )
+            )
+            for k in [
+                attr for attr in dir(before) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(before, k)) and k not in k_ignores
+        }
+        afterattrs = {
+            k: (
+                str(getattr(after, k))
+                if not isinstance(getattr(after, k), ktypes)
+                else (
+                    len(getattr(after, k))
+                    if isinstance(getattr(after, k), list)
+                    else len(getattr(after, k).keys())
+                    if isinstance(getattr(after, k), dict)
+                    else discord.utils.format_dt(getattr(after, k), "R")
+                    if isinstance(getattr(after, k), datetime.datetime)
+                    else getattr(after, k).name
+                )
+            )
+            for k in [
+                attr for attr in dir(after) if attr[:2] != "__" and attr[0] != "_"
+            ]
+            if "bound method" not in str(getattr(after, k)) and k not in k_ignores
+        }
+        differences = {
+            k: (beforeattrs[k], v) for k, v in afterattrs.items() if beforeattrs[k] != v
+        }
+
+        for name, change in differences.items():
+            embed.description += f"`{name.upper()}:` {change[0]} → {change[1]}\n"
+        embed.description = embed.description.removesuffix("\n")
+
+        return await logchannel.send(embed=embed)
 
 
 async def setup(bot: Xanno) -> None:

@@ -50,5 +50,4 @@ LOGGING_CALLBACKS = {
     "on_thread_member_join": False,
     "on_thread_member_remove": False,
     "on_voice_state_update": False,
-    "bot_on_ready": False,
 }
